@@ -1,0 +1,8 @@
+id_pedido,data_do_pedido,valor_total,id_produto,categoria
+3001,2025-01-05,175.20,PROD001,Eletrônicos
+3002,2025-02-01,99.99,Roupas,PROD002
+3003,2025-03-10,320.50,PROD003,Casa
+3004,2025-01-18,130.00,PROD001,Eletrônicos
+3005,2025-04-20,55.60,PROD004,Casa
+3006,2025-02-25,88.45,PROD002,Roupas
+3007,2025-03-12,195.30,PROD005,Eletrônicos

@@ -1,0 +1,8 @@
+sabor,valor_total,id_pedido,categoria,tamanho,id_produto,data_do_pedido,cor
+doce,200.40,2001,Eletrônicos,M,PROD001,2025-01-10,vermelho
+salgado,75.80,2002,Roupas,G,PROD002,2025-02-20,azul
+neutro,300.00,2003,Casa,P,PROD003,2025-03-15,preto
+azedo,110.25,2004,Eletrônicos,M,PROD001,2025-01-25,branco
+doce,60.70,2005,Casa,G,PROD004,2025-04-05,verde
+salgado,90.15,2006,Roupas,P,PROD002,2025-02-28,amarelo
+neutro,220.90,2007,Eletrônicos,M,PROD005,2025-03-30,roxo
