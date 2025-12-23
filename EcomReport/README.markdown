@@ -1,6 +1,6 @@
 # EcomReport
 
-EcomReport is a Python-based desktop application designed to generate detailed sales reports from e-commerce CSV data. Part of the [PythonApps](https://github.com/<your-username>/PythonApps) repository, it processes sales data, performs statistical analysis, and creates professional visualizations (bar, line, and donut charts) with PDF export capabilities. The app features a modular architecture for scalability and maintainability.
+EcomReport is a Python-based desktop application designed to generate detailed sales reports from e-commerce CSV data. Part of the [PythonApps](https://github.com/GummyTheProgrammy/PythonApps) repository, it processes sales data, performs statistical analysis, and creates professional visualizations (bar, line, and donut charts) with PDF export capabilities. The app features a modular architecture for scalability and maintainability.
 
 ---
 

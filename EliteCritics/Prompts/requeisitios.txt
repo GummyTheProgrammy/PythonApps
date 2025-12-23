@@ -1,0 +1,17 @@
+Design and implement data pipelines (dbt, Trino, Spark)
+	Preciso de um projeto rápido disso
+
+Perform dimensional modelling and data transformation
+	Preciso de um projeto rápido disso
+	
+Develop dashboards and reports (Power BI as a plus)
+	Eu tenho link
+
+Write SQL queries and Python scripts for data processing.
+	2 repositórios no github
+	
+Containerise data workflows and support hybrid deployments
+	Preciso de um projeto rápido disso
+	
+	
+world peckers

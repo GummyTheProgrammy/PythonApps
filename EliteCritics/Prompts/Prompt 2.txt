@@ -1,0 +1,107 @@
+Me ajude a criar um programa em python, baseado em Web Scraping
+Ainda não quero código
+Se você mandar código eu tiro minha própria vida
+Quero que você encontre falhas na minha lógica
+Futuramente vou criar uma interface gráfica para ele
+Por enquanto ele vai rodar no prompt de comandos
+Ele vai se chamar Elite Critics
+EliteCritics.py
+
+Entrada
+Nome do filme
+
+URL 1
+https://www.rottentomatoes.com/m/nome_do_filme
+Note que nome do critico está separado por '_'
+o que significa o '/m/' na url?
+Primeiro webscraping:
+Se o filme não for registrado: Guardar nome do filme, nota do filme e gênero (vai ser util para evitar web scraping repetivivo) (#1)
+Depois acessa a pagina com as reviews
+
+URL 2
+https://www.rottentomatoes.com/m/nome_do_filme/reviews
+Nisso a opção All Critics já vai estar marcado né?
+Segundo webscraping:
+Se o crítico não for registrado: Guardar nomes dos críticos e notas (bool)
+Dúvida: vão ser só os primeiros? Eu precisaria de todos, será que preciso dar "Load More" várias vezes para carregar todos?
+Depois criar um laço de repetição que vai pesquisar TODOS os críticos {laço 1}
+
+URLs 3
+https://www.rottentomatoes.com/critics/nome-do-critico/movies
+Note que nome do critico está separado por '-'
+Terceiro webscraping:
+Guardar nome dos filmes que ele avaliou e aprovação
+Dúvida: vão ser só os primeiros? Eu precisaria de todos, será que preciso dar "Load More" várias vezes para carregar todos? 
+Depois criar um laço de repetição que vai pesquisar TODOS os filmes criticados por esse crítico {laço 2}
+
+URLs 4
+https://www.rottentomatoes.com/m/nome_do_filme
+Quarto webscraping:
+Guardar nome do filme, nota do filme e gênero (vai ser util para evitar web scraping repetivivo) (#2)
+Se o gênero desse filme (#2) bater com o genero do filme avaliado (#1) e eles não tiverem o mesmo nome, dar 1 ponto de experiencia para o crítico
+
+AO fim do laço de filmes do crítico {laço 2}, ele vai ter a pontuação em experiencia
+De acordo com a experiencia ele ganha um ranking
+se exp <= 9 então rank 0
+se exp <= 19 e exp >=10 então rank 1
+se exp <= 49 e exp >=20 então rank 2
+se exp >= 50 então rank 3
+Na realidade seria interessante ficar verificando se o crítico já é rank 3, por que se for, quebra o laço de repetição e já vai pro próximo crítico
+
+Ao fim do laço de críticos {laço 2}, recalcular a nota do filme baseado na aprovação dos críticos
+
+SAÍDA
+
+Nota dos críticos I - no room for noobies (NDCI)
+Fazer o calculo normal de notas dos críticos excluindo os rank 0
+
+Nota dos críticos II - hierarchy (NDCII)
+Dar pesos para as notas dos críticos dentro de ranks
+Uma nota de um crítico Rank 1 vale duas vezes mais que um crítico Rank 0
+Uma nota de um crítico Rank 2 vale duas vezes mais que um crítico Rank 1
+Uma nota de um crítico Rank 3 vale duas vezes mais que um crítico Rank 2
+Pode ser que eu mude de idéia depois, então ao invés de ser simplemente um "vezes 2" coloque "vezes x" e o valor de x como 2 para que eu possa ajustar conformem necessário
+
+PROBLEMÁTICA PARTE 1:
+Existem filmes com multiplos generos
+Wicked: For Good
+Ele é Kids & Family/Musical/Fantasy/Adventure
+4 generos porra
+O que isso gera, situações como essa
+Exemplo, bernardo é um crítico especializado em fantasia, é rank 3
+Mas nunca analisou um musical
+Se ele der uma nota ruim pro filme, pode pesar mais do que um crítico Rank 2 que já fez várias reviews nos outros generos do filme
+Eu penso em nerfar isso, mas no fundo, eu acho justo manter assim
+Sabe por que? 
+Eu não assisti esse Wicked mas e se ele for otimo em Kids & Family/Musical/Adventure e for péssimo em Fantasy? 
+A opinião dos críticos especializados em fantasia deve contar também!
+Então, quando guardar o genero de um filme, ele pode ter multiplos generos
+E quando for comparar o genero de filmes, apenas 1 genero precisa bater
+
+PROBLEMÁTICA PARTE 2
+Existem filmes com o mesmo nome
+A chave primaria pode ser a URL
+Exemplo: Twilight
+Tem o twilight de 2008, a URL dele é assim:
+https://www.rottentomatoes.com/m/twilight
+E tem o Twilight de 1998, a URL dele é assim:
+https://www.rottentomatoes.com/m/1082855-twilight
+
+PROBLEMÁTICA PARTE 3
+Base de dados
+O ideal era eu criar uma base de dados no SQL né... poisé
+Mas n vou
+Cria um arquivo excel
+E várias páginas
+Filmes (URL, Nome, nota, gênero, NDCI, NDCII)
+Criticos (URL, Nome, exp, rank)
+Criticas (URL crítico [chave estrangeira], URL Filme [chave estrangeira], aprovação (bool), chave primária)
+Um adendo: exp e rank de críticos na realidade são listas baseadas em genero, um crítico pode ter 2 exp em Musical (rank 0 musical critic) mas 99 exp em Documentary (rank 3 Documentary critic)
+Vai ficar mais legível programacionalmente se "Filmes, Criticos e Criticas" estiverem no plural ou singular?
+
+Responda minhas dúvidas
+Encontre falhas na minha lógica
+Encontre inconsistencias na minha lógica
+Encontre praticas de programação que vão ser custosas para o programa
+Ainda não quero código
+Se você mandar código eu tiro minha própria vida
