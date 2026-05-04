@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cortador de Imagem Horizontal</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .container { max-width: 800px; width: 100%; text-align: center; border: 1px solid #333; padding: 20px; border-radius: 8px; background: #1e1e1e; }
+        canvas { max-width: 100%; height: auto; border: 2px solid #555; margin-top: 10px; }
+        .controls { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+        input[type="range"] { width: 300px; }
+        button { padding: 10px 20px; cursor: pointer; background: #007bff; border: none; color: white; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        .labels { display: flex; justify-content: space-between; width: 300px; font-size: 0.9em; color: #bbb; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cortador de Imagem Horizontal</h2>
+    
+    <input type="file" id="upload" accept="image/*">
+    
+    <div class="controls">
+        <div class="labels"><span>Topo (Threshold Superior)</span><span id="topVal">0%</span></div>
+        <input type="range" id="topThreshold" min="0" max="100" value="0">
+        
+        <div class="labels"><span>Base (Threshold Inferior)</span><span id="bottomVal">100%</span></div>
+        <input type="range" id="bottomThreshold" min="0" max="100" value="100">
+        
+        <button id="downloadBtn">Download Imagem Recortada</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+</div>
+
+<script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const topSlider = document.getElementById('topThreshold');
+    const bottomSlider = document.getElementById('bottomThreshold');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let originalImage = new Image();
+
+    // Carregar imagem
+    upload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            originalImage.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    originalImage.onload = () => {
+        render();
+    };
+
+    // Atualizar ao mover os sliders
+    [topSlider, bottomSlider].forEach(slider => {
+        slider.addEventListener('input', () => {
+            // Garantir que o topo não passe da base
+            if (parseInt(topSlider.value) >= parseInt(bottomSlider.value)) {
+                if (slider === topSlider) topSlider.value = parseInt(bottomSlider.value) - 1;
+                else bottomSlider.value = parseInt(topSlider.value) + 1;
+            }
+            
+            document.getElementById('topVal').innerText = topSlider.value + "%";
+            document.getElementById('bottomVal').innerText = bottomSlider.value + "%";
+            render();
+        });
+    });
+
+    function render() {
+        if (!originalImage.src) return;
+
+        const w = originalImage.width;
+        const h = originalImage.height;
+
+        // Definir limites de corte
+        const yStart = (topSlider.value / 100) * h;
+        const yEnd = (bottomSlider.value / 100) * h;
+        const cropHeight = yEnd - yStart;
+
+        canvas.width = w;
+        canvas.height = cropHeight;
+
+        // Desenha apenas a fatia selecionada
+        ctx.drawImage(originalImage, 0, yStart, w, cropHeight, 0, 0, w, cropHeight);
+    }
+
+    // Download
+    downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'imagem-recortada.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+</script>
+
+</body>
+</html>
