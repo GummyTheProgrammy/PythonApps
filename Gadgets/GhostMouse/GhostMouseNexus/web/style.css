@@ -1,0 +1,65 @@
+:root {
+    --bg: #e0e5ec;
+    --light: #ffffff;
+    --dark: #a3b1c6;
+    --accent: #00f260;
+    --recording: #ff4b2b;
+}
+
+body {
+    background: var(--bg);
+    color: #4a5568;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: filter 1s ease;
+    will-change: filter;
+}
+
+.header { padding: 2rem; margin-bottom: auto; }
+.header h1 { font-size: 1.8rem; margin: 0; }
+.header h2 { font-size: 0.9rem; font-weight: normal; opacity: 0.7; }
+
+.content-center {
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.neumorphic-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg);
+    box-shadow: 10px 10px 20px var(--dark), -10px -10px 20px var(--light);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.neumorphic-btn:active {
+    box-shadow: inset 6px 6px 12px var(--dark), inset -6px -6px 12px var(--light);
+}
+
+.icon-idle { width: 40px; height: 40px; background: var(--dark); border-radius: 50%; }
+.recording .icon-idle { background: var(--recording); animation: pulse 1s infinite; }
+.playing .icon-idle { background: var(--accent); border-radius: 10px; }
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.footer { margin-top: auto; padding: 2rem; text-align: right; font-size: 0.8rem; opacity: 0.6; }
+
+.blur-effect { filter: blur(10px); }
+.hidden { display: none; }

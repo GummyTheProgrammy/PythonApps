@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Nexus Template Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <h1 class="title">NEXUS GENERATOR</h1>
+
+        <div id="upload-screen">
+            <div id="drop-zone" class="neumorph-box">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#31363F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <p id="status-text">Arraste a planilha aqui ou clique para selecionar</p>
+                <input type="file" id="file-input" accept=".xlsx, .xls" hidden>
+            </div>
+        </div>
+
+        <div id="loading-screen" class="hidden">
+            <div class="loader"></div>
+            <div class="progress-container neumorph-box-inset">
+                <div id="progress-bar" class="progress-fill"></div>
+            </div>
+            <h2 id="progress-percentage">0%</h2>
+            <p id="progress-text">Iniciando processamento...</p>
+        </div>
+
+        <div id="result-screen" class="hidden">
+            <div class="result-header">Processamento Concluído</div>
+            <div class="button-group">
+                <button id="btn-open-folder" class="neumorph-btn primary">Acessar Pasta de Origem</button>
+                <button id="btn-open-zip" class="neumorph-btn">Arquivo ZIP Completo</button>
+            </div>
+            <div id="file-list" class="neumorph-box-inset list-container">
+                </div>
+            <button id="btn-reset" class="neumorph-btn" style="margin-top: 20px;">Processar Novo Arquivo</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

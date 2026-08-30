@@ -1,0 +1,2 @@
+eel==0.16.0
+pyinstaller==6.10.0

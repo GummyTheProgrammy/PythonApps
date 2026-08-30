@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letras → PPTX</title>
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+  :root{
+    --bg:#0d0d0d;
+    --bg-alt:#1a1a1a;
+    --paper:#f2ead9;
+    --paper-line:#d8cdb4;
+    --ink:#201a14;
+    --red:#d1272a;
+    --red-dark:#9c1c1e;
+    --mustard:#e3a627;
+    --white:#f5f5f0;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(209,39,42,0.18), transparent 55%),
+      radial-gradient(ellipse at 100% 110%, rgba(227,166,39,0.10), transparent 50%),
+      var(--bg);
+    color:var(--white);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px 80px;
+  }
+
+  .wrap{ width:100%; max-width:640px; }
+
+  header{ text-align:center; margin-bottom:34px; }
+
+  .kicker{
+    font-family:"Courier New",monospace;
+    letter-spacing:0.35em;
+    font-size:11px;
+    color:var(--mustard);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+
+  h1{
+    font-family:Impact,"Arial Narrow Bold",Haettenschweiler,sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    font-size:clamp(38px,9vw,58px);
+    line-height:0.92;
+    margin:0 0 12px;
+    color:var(--white);
+    text-shadow: 3px 3px 0 var(--red);
+  }
+
+  .sub{
+    font-size:14px;
+    color:#b8b3a8;
+    max-width:440px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+
+  .sheet{
+    position:relative;
+    background:var(--paper);
+    color:var(--ink);
+    padding:34px 26px 26px;
+    border-radius:2px;
+    transform:rotate(-0.6deg);
+    box-shadow:0 18px 40px rgba(0,0,0,0.55), 0 2px 0 rgba(0,0,0,0.2);
+    margin-bottom:26px;
+  }
+
+  .tape{
+    position:absolute;
+    width:70px;
+    height:26px;
+    background:rgba(245,240,225,0.55);
+    border:1px solid rgba(0,0,0,0.05);
+    box-shadow:0 2px 4px rgba(0,0,0,0.25);
+  }
+  .tape.left{ top:-13px; left:28px; transform:rotate(-8deg); }
+  .tape.right{ top:-13px; right:28px; transform:rotate(6deg); }
+
+  label{
+    display:block;
+    font-family:"Courier New",monospace;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:10px;
+    color:var(--red-dark);
+  }
+
+  textarea{
+    width:100%;
+    min-height:300px;
+    resize:vertical;
+    border:none;
+    background:
+      repeating-linear-gradient(var(--paper) 0 27px, var(--paper-line) 27px 28px);
+    background-attachment:local;
+    line-height:28px;
+    font-family:"Courier New",monospace;
+    font-size:15px;
+    color:var(--ink);
+    padding:2px 4px;
+    outline:none;
+  }
+  textarea::placeholder{ color:#9a9282; }
+
+  .row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-top:16px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .field span{
+    font-family:"Courier New",monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#7a7364;
+  }
+  .field input[type=text]{
+    font-family:"Courier New",monospace;
+    font-size:13px;
+    padding:6px 8px;
+    border:1px solid var(--paper-line);
+    background:#fffdf7;
+    color:var(--ink);
+    width:170px;
+  }
+
+  button#gerar{
+    margin-left:auto;
+    background:var(--red);
+    color:var(--white);
+    border:none;
+    font-family:Impact,"Arial Narrow Bold",sans-serif;
+    font-weight:400;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    font-size:20px;
+    padding:12px 26px;
+    cursor:pointer;
+    transition:background 0.15s ease, transform 0.1s ease;
+  }
+  button#gerar:hover{ background:var(--mustard); color:#241b06; }
+  button#gerar:active{ transform:translateY(1px); }
+  button#gerar:disabled{ background:#7a7364; cursor:not-allowed; }
+
+  .log{
+    background:var(--bg-alt);
+    border:1px solid #2c2c2c;
+    padding:16px 18px;
+    font-family:"Courier New",monospace;
+    font-size:13px;
+    line-height:1.65;
+    color:#c9c5ba;
+    min-height:60px;
+    white-space:pre-wrap;
+  }
+  .log .ok{ color:#8bd17c; }
+  .log .warn{ color:var(--mustard); }
+  .log .err{ color:#ff6b6b; }
+  .log .title{ color:var(--white); font-weight:700; }
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:12px;
+    color:#5c584f;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kicker">Gerador de slides</div>
+    <h1>Letras&nbsp;→&nbsp;PPTX</h1>
+    <p class="sub">Cole a letra no formato <strong>### Título</strong> por música. Slide 9:16, tema rock, letra grande — divide em partes sozinho se não couber.</p>
+  </header>
+
+  <div class="sheet">
+    <div class="tape left"></div>
+    <div class="tape right"></div>
+    <label for="input">Cole aqui</label>
+    <textarea id="input" spellcheck="false" placeholder="### Nome da música&#10;Linha 1&#10;Linha 2&#10;&#10;Linha 3&#10;Linha 4&#10;&#10;### Próxima música&#10;..."></textarea>
+
+    <div class="row">
+      <div class="field">
+        <span>Nome do arquivo</span>
+        <input type="text" id="filename" value="letras.pptx">
+      </div>
+      <button id="gerar">Gerar PPTX</button>
+    </div>
+  </div>
+
+  <div class="log" id="log">Aguardando letra colada acima...</div>
+
+  <footer>Tudo roda no navegador — nada é enviado pra fora.</footer>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO — mesma lógica do script Python (letras_to_pptx.py)
+// ============================================================
+const SLIDE_WIDTH_IN = 7.5;
+const SLIDE_HEIGHT_IN = 13.333;
+
+const MARGIN_X_IN = 0.5;
+const MARGIN_TOP_IN = 0.6;
+const MARGIN_BOTTOM_IN = 0.5;
+
+const TITLE_HEIGHT_IN = 1.6;
+const TITLE_FONT_SIZES = [60, 54, 48, 44, 40, 36, 32, 28, 24];
+const TITLE_LINE_SPACING_FACTOR = 1.05;
+const TITLE_FONT_FACE = "Arial Black";
+const TITLE_COLOR = "E81F1F";
+
+// Marcador de parte (canto inferior direito, só o número)
+const PART_MARK_COLOR = "E3A627";
+const PART_MARK_FONT_SIZE = 20;
+
+const FONT_SIZES_LYRIC = [50, 44, 40, 36, 32, 28, 24, 20];
+const LYRIC_FONT_FACE = "Arial Black";
+const LYRIC_COLOR = "FFFFFF";
+const LINE_SPACING_FACTOR = 1.12;
+const PARAGRAPH_GAP_PT = 14;
+
+const BG_COLOR = "121212";
+
+const SAFETY_MARGIN = 0.90;
+const PX_PER_IN = 96; // só usado internamente pra medir texto no canvas
+
+// ============================================================
+// PARSING
+// ============================================================
+function parseInput(text) {
+  const blocks = text.split(/^###\s*/m);
+  const slides = [];
+  for (const block of blocks) {
+    if (!block.trim()) continue;
+    const lines = block.split(/\r?\n/);
+    const title = lines[0].trim();
+    const body = lines.slice(1).join("\n").replace(/^\n+|\n+$/g, "");
+
+    const rawParagraphs = body.split(/\n\s*\n/);
+    const paragraphs = [];
+    for (let rp of rawParagraphs) {
+      rp = rp.replace(/^\n+|\n+$/g, "");
+      if (!rp.trim()) continue;
+      paragraphs.push(rp.split("\n"));
+    }
+    if (paragraphs.length) slides.push({ title, paragraphs });
+  }
+  return slides;
+}
+
+// ============================================================
+// MEDIÇÃO DE TEXTO (canvas — bem mais precisa que uma heurística)
+// ============================================================
+const measureCanvas = document.createElement("canvas");
+const ctx = measureCanvas.getContext("2d");
+
+function fontString(fontSizePt, fontFace) {
+  const px = fontSizePt * PX_PER_IN / 72;
+  return `bold ${px}px "${fontFace}", Impact, sans-serif`;
+}
+
+function wrapLineByWidth(line, fontSizePt, boxWidthIn, fontFace = LYRIC_FONT_FACE) {
+  if (line.trim() === "") return [""];
+  ctx.font = fontString(fontSizePt, fontFace);
+  const boxWidthPx = boxWidthIn * PX_PER_IN;
+
+  const words = line.split(" ");
+  const wrapped = [];
+  let current = "";
+  for (let word of words) {
+    const candidate = current ? current + " " + word : word;
+    if (ctx.measureText(candidate).width <= boxWidthPx) {
+      current = candidate;
+    } else {
+      if (current) wrapped.push(current);
+      // palavra sozinha maior que a caixa: quebra bruta por caractere
+      while (ctx.measureText(word).width > boxWidthPx && word.length > 1) {
+        let cut = word.length;
+        while (cut > 1 && ctx.measureText(word.slice(0, cut)).width > boxWidthPx) cut--;
+        wrapped.push(word.slice(0, cut));
+        word = word.slice(cut);
+      }
+      current = word;
+    }
+  }
+  if (current) wrapped.push(current);
+  return wrapped.length ? wrapped : [""];
+}
+
+function paragraphHeightIn(paragraphLines, fontSizePt, boxWidthIn) {
+  const lineHeightIn = (fontSizePt * LINE_SPACING_FACTOR) / 72;
+  let totalLines = 0;
+  for (const line of paragraphLines) {
+    totalLines += wrapLineByWidth(line, fontSizePt, boxWidthIn).length;
+  }
+  return totalLines * lineHeightIn;
+}
+
+function paragraphsBlockHeightIn(paragraphs, fontSizePt, boxWidthIn) {
+  const gapIn = PARAGRAPH_GAP_PT / 72;
+  let total = 0;
+  paragraphs.forEach((para, i) => {
+    total += paragraphHeightIn(para, fontSizePt, boxWidthIn);
+    if (i < paragraphs.length - 1) total += gapIn;
+  });
+  return total;
+}
+
+// ============================================================
+// AUTO-FIT DO TÍTULO (reduz a fonte até caber na caixa, sem vazar)
+// ============================================================
+function fitTitle(title, boxWidthIn, boxHeightIn) {
+  const availW = boxWidthIn * SAFETY_MARGIN;
+  const availH = boxHeightIn * SAFETY_MARGIN;
+  const text = title.toUpperCase();
+
+  for (const fontSize of TITLE_FONT_SIZES) {
+    const wrapped = wrapLineByWidth(text, fontSize, availW, TITLE_FONT_FACE);
+    const lineHeightIn = (fontSize * TITLE_LINE_SPACING_FACTOR) / 72;
+    const totalH = wrapped.length * lineHeightIn;
+    if (totalH <= availH) {
+      return { fontSize, lines: wrapped };
+    }
+  }
+  // nem a menor fonte coube (título absurdamente longo) — usa a menor mesmo assim
+  const fontSize = TITLE_FONT_SIZES[TITLE_FONT_SIZES.length - 1];
+  return { fontSize, lines: wrapLineByWidth(text, fontSize, availW, TITLE_FONT_FACE) };
+}
+
+// ============================================================
+// PLANO DE SLIDES POR MÚSICA (quebra sempre entre parágrafos)
+// ============================================================
+function planSlidesForSong(paragraphs, boxWidthIn, boxHeightIn) {
+  const availW = boxWidthIn * SAFETY_MARGIN;
+  const availH = boxHeightIn * SAFETY_MARGIN;
+
+  const plan = [];
+  let remaining = paragraphs.slice();
+
+  while (remaining.length) {
+    let chosenFont = null;
+    let chosenCount = 0;
+
+    for (const fontSize of FONT_SIZES_LYRIC) {
+      let count = 0;
+      for (let n = 1; n <= remaining.length; n++) {
+        const h = paragraphsBlockHeightIn(remaining.slice(0, n), fontSize, availW);
+        if (h <= availH) count = n; else break;
+      }
+      if (count > 0) { chosenFont = fontSize; chosenCount = count; break; }
+    }
+
+    if (chosenFont === null) {
+      chosenFont = FONT_SIZES_LYRIC[FONT_SIZES_LYRIC.length - 1];
+      chosenCount = 1;
+    }
+
+    plan.push({ paragraphs: remaining.slice(0, chosenCount), fontSize: chosenFont });
+    remaining = remaining.slice(chosenCount);
+  }
+
+  return plan;
+}
+
+// ============================================================
+// GERAÇÃO DO PPTX (pptxgenjs)
+// ============================================================
+function buildPptx(slidesData) {
+  const pres = new PptxGenJS();
+  pres.defineLayout({ name: "PORT916", width: SLIDE_WIDTH_IN, height: SLIDE_HEIGHT_IN });
+  pres.layout = "PORT916";
+
+  const boxWidthIn = SLIDE_WIDTH_IN - 2 * MARGIN_X_IN;
+  const lyricsTopIn = MARGIN_TOP_IN + TITLE_HEIGHT_IN;
+  const lyricsHeightIn = SLIDE_HEIGHT_IN - lyricsTopIn - MARGIN_BOTTOM_IN;
+
+  const logLines = [];
+
+  for (const song of slidesData) {
+    const plan = planSlidesForSong(song.paragraphs, boxWidthIn, lyricsHeightIn);
+    const multi = plan.length > 1;
+
+    plan.forEach((slideInfo, idx) => {
+      const slide = pres.addSlide();
+      slide.background = { color: BG_COLOR };
+
+      const fitted = fitTitle(song.title, boxWidthIn, TITLE_HEIGHT_IN);
+
+      slide.addText(fitted.lines.join("\n"), {
+        x: MARGIN_X_IN, y: MARGIN_TOP_IN, w: boxWidthIn, h: TITLE_HEIGHT_IN,
+        fontFace: TITLE_FONT_FACE, fontSize: fitted.fontSize, bold: true,
+        color: TITLE_COLOR, align: "left", valign: "top", margin: 0,
+        lineSpacing: fitted.fontSize * TITLE_LINE_SPACING_FACTOR
+      });
+
+      if (multi) {
+        slide.addText(String(idx + 1), {
+          x: SLIDE_WIDTH_IN - MARGIN_X_IN - 0.7, y: SLIDE_HEIGHT_IN - MARGIN_BOTTOM_IN - 0.5,
+          w: 0.7, h: 0.5,
+          fontFace: LYRIC_FONT_FACE, fontSize: PART_MARK_FONT_SIZE, bold: true,
+          color: PART_MARK_COLOR, align: "right", valign: "bottom", margin: 0
+        });
+      }
+
+      const runs = [];
+      slideInfo.paragraphs.forEach((para, pi) => {
+        if (pi > 0) {
+          runs.push({ text: "", options: { fontSize: slideInfo.fontSize, breakLine: true } });
+        }
+        para.forEach((line) => {
+          runs.push({
+            text: line.trim() === "" ? " " : line,
+            options: { breakLine: true }
+          });
+        });
+      });
+
+      slide.addText(runs, {
+        x: MARGIN_X_IN, y: lyricsTopIn, w: boxWidthIn, h: lyricsHeightIn,
+        fontFace: LYRIC_FONT_FACE, fontSize: slideInfo.fontSize, bold: true,
+        color: LYRIC_COLOR, align: "left", valign: "top", margin: 0,
+        lineSpacing: slideInfo.fontSize * LINE_SPACING_FACTOR
+      });
+
+      logLines.push({
+        text: `${song.title}${multi ? " → parte " + (idx + 1) + "/" + plan.length : ""} (fonte ${slideInfo.fontSize}pt)`,
+        multi
+      });
+    });
+  }
+
+  return { pres, logLines };
+}
+
+// ============================================================
+// UI
+// ============================================================
+const logEl = document.getElementById("log");
+const btn = document.getElementById("gerar");
+
+function setLog(html) { logEl.innerHTML = html; }
+
+btn.addEventListener("click", async () => {
+  const text = document.getElementById("input").value;
+  const filename = (document.getElementById("filename").value || "letras.pptx").trim();
+
+  if (typeof PptxGenJS === "undefined") {
+    setLog('<span class="err">A biblioteca PptxGenJS não carregou (precisa de internet na primeira vez, ou algo bloqueou cdn.jsdelivr.net). Verifique a conexão e recarregue a página.</span>');
+    return;
+  }
+
+  if (!text.trim()) {
+    setLog('<span class="err">Cola a letra antes de gerar.</span>');
+    return;
+  }
+
+  const slidesData = parseInput(text);
+  if (!slidesData.length) {
+    setLog('<span class="err">Nenhum slide encontrado. Confira se cada música começa com "### Título".</span>');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Gerando...";
+
+  try {
+    const { pres, logLines } = buildPptx(slidesData);
+    const finalName = filename.endsWith(".pptx") ? filename : filename + ".pptx";
+    await pres.writeFile({ fileName: finalName });
+
+    const lines = logLines.map(l => `<span class="${l.multi ? 'warn' : 'ok'}">✓ ${l.text}</span>`).join("\n");
+    setLog(`<span class="title">${slidesData.length} música(s) → ${finalName}</span>\n\n${lines}`);
+  } catch (err) {
+    setLog(`<span class="err">Erro ao gerar: ${err.message}</span>`);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Gerar PPTX";
+  }
+});
+</script>
+</body>
+</html>

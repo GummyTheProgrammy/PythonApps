@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Extrator de Dados</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #e0e5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #4a4a4a;
+        }
+        .container {
+            width: 450px;
+            padding: 40px;
+            border-radius: 20px;
+            background: #e0e5ec;
+            box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
+            text-align: center;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            background: #e0e5ec;
+            box-shadow: 5px 5px 10px #a3b1c6, -5px -5px 10px #ffffff;
+            color: #4a4a4a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 1em;
+            width: 100%;
+        }
+        .btn:active {
+            box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+        }
+        .progress-wrapper {
+            margin-top: 30px;
+            display: none;
+        }
+        .progress-container {
+            width: 100%;
+            height: 25px;
+            border-radius: 12px;
+            background: #e0e5ec;
+            box-shadow: inset 5px 5px 10px #a3b1c6, inset -5px -5px 10px #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+        .phase-label {
+            margin-top: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #e0e5ec;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
+            display: none;
+            z-index: 100;
+            text-align: center;
+            width: 300px;
+        }
+        .popup button {
+            margin-top: 25px;
+        }
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(224, 229, 236, 0.7);
+            display: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Conversor PST</h2>
+    <button class="btn" id="uploadBtn" onclick="selectFile()">Carregar Arquivo PST</button>
+
+    <div class="progress-wrapper" id="progWrapper">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+        <div class="phase-label" id="phaseLabel">Fase 1 de 2 &mdash; Convertendo</div>
+        <div class="status" id="statusText">0.0%</div>
+    </div>
+</div>
+
+<div id="overlay"></div>
+<div class="popup" id="popup">
+    <h3 id="popupMessage">Processo Concluido</h3>
+    <button class="btn" onclick="closePopup()">Fechar</button>
+</div>
+
+<script>
+    function selectFile() {
+        eel.select_file()(function (filePath) {
+            if (filePath) {
+                document.getElementById('uploadBtn').style.display = 'none';
+                document.getElementById('progWrapper').style.display = 'block';
+                document.getElementById('phaseLabel').innerText = 'Fase 1 de 2 — Convertendo';
+                document.getElementById('statusText').innerText = 'Iniciando leitura do arquivo...';
+                document.getElementById('progBar').style.width = '0%';
+
+                // Dispara o processamento no backend (roda em thread propria)
+                eel.process_pst(filePath);
+            }
+        });
+    }
+
+    const PHASE_LABELS = {
+        converting: 'Fase 1 de 2 — Convertendo',
+        extracting: 'Fase 2 de 2 — Gerando CSV',
+        done: 'Concluido',
+        error: 'Erro',
+    };
+
+    // Exposta para o Python chamar via eel.update_progress(state) a partir
+    // da thread de fundo. Funciona via WebSocket, entao nao ha risco de
+    // travamento de UI thread como haveria com pywebview/WebView2.
+    // O percentual e sempre float (pode ser 0.0, 43.7, 99.99 etc), medido
+    // por fase (nao um numero fixo tipo 1/6, 2/6).
+    function update_progress(state) {
+        const label = PHASE_LABELS[state.phase] || state.phase;
+        document.getElementById('phaseLabel').innerText = label;
+
+        if (state.phase === 'converting' || state.phase === 'extracting') {
+            const pct = Number(state.percent).toFixed(1);
+            document.getElementById('progBar').style.width = pct + '%';
+            document.getElementById('statusText').innerText = pct + '% — ' + state.message;
+
+        } else if (state.phase === 'done') {
+            document.getElementById('progBar').style.width = '100%';
+            document.getElementById('statusText').innerText = state.message;
+            showPopup(state.message);
+
+        } else if (state.phase === 'error') {
+            document.getElementById('statusText').innerText = state.message;
+            showPopup(state.message);
+        }
+    }
+    eel.expose(update_progress);
+
+    function showPopup(message) {
+        document.getElementById('popupMessage').innerText = message;
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('popup').style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('popup').style.display = 'none';
+        document.getElementById('progWrapper').style.display = 'none';
+        document.getElementById('progBar').style.width = '0%';
+        document.getElementById('uploadBtn').style.display = 'block';
+    }
+</script>
+</body>
+</html>

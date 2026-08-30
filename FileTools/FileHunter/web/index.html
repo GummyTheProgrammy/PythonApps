@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Arquivos</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        :root {
+            --bg-color: #e0e5ec;
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --accent-green: #4caf50;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            height: 100vh;
+            box-sizing: border-box;
+            color: #4a4a4a;
+        }
+
+        .module {
+            width: 48%;
+            border-radius: 20px;
+            padding: 30px;
+            background: var(--bg-color);
+            box-shadow: 9px 9px 16px var(--shadow-dark), -9px -9px 16px var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        /* Input Neumórfico para digitar a pasta */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: var(--bg-color);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+            font-family: inherit;
+            color: #4a4a4a;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus {
+            box-shadow: inset 7px 7px 14px var(--shadow-dark), inset -7px -7px 14px var(--shadow-light);
+        }
+
+        button {
+            background: var(--bg-color);
+            border: none;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #4a4a4a;
+            cursor: pointer;
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+            transition: all 0.2s ease;
+        }
+
+        button:active {
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group button {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .action-button {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        /* Barra de Progresso Neumórfica */
+        .progress-track {
+            width: 100%;
+            height: 25px;
+            border-radius: 15px;
+            background: var(--bg-color);
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-green);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .status-text {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        /* Seção do Módulo Direito */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .file-display {
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            font-size: 0.85em;
+            word-break: break-all;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hidden { display: none !important; }
+        .row-buttons { display: flex; justify-content: space-between; gap: 10px; }
+        .row-buttons button { flex: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- MÓDULO ESQUERDO: Mapeamento -->
+    <div class="module">
+        <h2>Mapeamento de Arquivos</h2>
+        
+        <div class="input-group">
+            <input type="text" id="folder-path" placeholder="Cole ou digite o caminho da pasta...">
+            <button onclick="browseFolder()">Procurar</button>
+        </div>
+        
+        <button class="action-button" onclick="startMapping()">Iniciar Mapeamento</button>
+        
+        <div class="progress-track">
+            <div id="left-progress" class="progress-fill"></div>
+        </div>
+        <div id="left-status" class="status-text">Aguardando operação...</div>
+    </div>
+
+    <!-- MÓDULO DIREITO: Exclusão -->
+    <div class="module">
+        <h2>Limpeza do Sistema</h2>
+        
+        <div id="init-screen" class="action-area">
+            <div class="status-text">Como deseja prosseguir com a exclusão dos arquivos mapeados?</div>
+            <button class="action-button" onclick="startDeletion('bulk')">Excluir tudo de uma vez (Automático)</button>
+            <button class="action-button" onclick="startDeletion('step')">Perguntar arquivo por arquivo</button>
+        </div>
+
+        <div id="step-screen" class="action-area hidden">
+            <div class="status-text">Arquivo atual:</div>
+            <div id="current-file" class="file-display">Nenhum arquivo carregado</div>
+            
+            <div class="row-buttons">
+                <button onclick="copyCurrentPath()">Copiar Caminho da Pasta</button>
+            </div>
+            <div class="row-buttons">
+                <button onclick="processStep(true)" style="color: #d32f2f;">Excluir Arquivo</button>
+                <button onclick="processStep(false)">Manter (Pular)</button>
+            </div>
+            
+            <div class="progress-track">
+                <div id="right-progress" class="progress-fill"></div>
+            </div>
+            <div id="right-status" class="status-text">0 / 0 processados</div>
+        </div>
+    </div>
+
+    <script>
+        let fileQueue = [];
+        let totalQueueSize = 0;
+        let currentFileIndex = 0;
+        let currentFilePath = "";
+
+        // ----- FUNÇÕES MÓDULO ESQUERDO -----
+
+        async function browseFolder() {
+            document.getElementById('left-status').innerText = "Abrindo janela de seleção...";
+            let folder = await eel.pick_folder_native()();
+            
+            if (folder) {
+                document.getElementById('folder-path').value = folder;
+                document.getElementById('left-status').innerText = "Pasta selecionada. Pronto para mapear.";
+            } else {
+                document.getElementById('left-status').innerText = "Seleção cancelada.";
+            }
+        }
+        
+        async function startMapping() {
+            let folder = document.getElementById('folder-path').value.trim();
+            
+            if (!folder) {
+                alert("Por favor, digite um caminho ou selecione uma pasta primeiro.");
+                return;
+            }
+
+            document.getElementById('left-status').innerText = "Mapeando arquivos, aguarde...";
+            document.getElementById('left-progress').style.width = "0%";
+            
+            try {
+                // Agora esperamos um objeto {success: bool, error: string}
+                let response = await eel.map_and_log_directory(folder)();
+                
+                if (response.success) {
+                    document.getElementById('left-status').innerText = "Mapeamento concluído com sucesso!";
+                } else {
+                    document.getElementById('left-status').innerText = response.error;
+                    document.getElementById('left-status').style.color = "#d32f2f";
+                }
+            } catch (err) {
+                document.getElementById('left-status').innerText = "Falha de comunicação com o backend.";
+                console.error(err);
+            }
+        }
+
+        eel.expose(update_left_progress);
+        function update_left_progress(val_float) {
+            document.getElementById('left-progress').style.width = val_float + "%";
+        }
+
+        // ----- FUNÇÕES MÓDULO DIREITO -----
+
+        async function startDeletion(mode) {
+            fileQueue = await eel.load_log()();
+            totalQueueSize = fileQueue.length;
+            currentFileIndex = 0;
+
+            if (totalQueueSize === 0) {
+                alert("Nenhum log encontrado ou log vazio. Por favor, mapeie primeiro.");
+                return;
+            }
+
+            if (mode === 'bulk') {
+                if (confirm(`Atenção! Você está prestes a excluir ${totalQueueSize} arquivos. Tem certeza?`)) {
+                    executeBulkDeletion();
+                }
+            } else if (mode === 'step') {
+                document.getElementById('init-screen').classList.add('hidden');
+                document.getElementById('step-screen').classList.remove('hidden');
+                loadNextFile();
+            }
+        }
+
+        async function executeBulkDeletion() {
+            document.getElementById('init-screen').classList.add('hidden');
+            document.getElementById('step-screen').classList.remove('hidden');
+            document.querySelector('.row-buttons').classList.add('hidden'); 
+            
+            for (let i = 0; i < fileQueue.length; i++) {
+                await eel.delete_file(fileQueue[i])();
+                let progress = ((i + 1) / totalQueueSize) * 100;
+                document.getElementById('right-progress').style.width = progress + "%";
+                document.getElementById('right-status').innerText = `${i + 1} / ${totalQueueSize} processados`;
+            }
+            
+            document.getElementById('current-file').innerText = "Exclusão em massa concluída.";
+        }
+
+        function loadNextFile() {
+            if (currentFileIndex < totalQueueSize) {
+                currentFilePath = fileQueue[currentFileIndex];
+                document.getElementById('current-file').innerText = currentFilePath;
+                updateRightStatus();
+            } else {
+                document.getElementById('current-file').innerText = "Todos os arquivos foram verificados.";
+                document.getElementById('right-progress').style.width = "100%";
+            }
+        }
+
+        async function processStep(shouldDelete) {
+            if (currentFileIndex >= totalQueueSize) return;
+
+            if (shouldDelete) {
+                await eel.delete_file(currentFilePath)();
+            }
+
+            currentFileIndex++;
+            updateRightStatus();
+            loadNextFile();
+        }
+
+        function updateRightStatus() {
+            let progress = (currentFileIndex / totalQueueSize) * 100;
+            document.getElementById('right-progress').style.width = progress + "%";
+            document.getElementById('right-status').innerText = `${currentFileIndex} / ${totalQueueSize} avaliados`;
+        }
+
+        function copyCurrentPath() {
+            if (!currentFilePath) return;
+            let dirPath = currentFilePath.substring(0, currentFilePath.lastIndexOf('\\'));
+            navigator.clipboard.writeText(dirPath).then(() => {
+                alert("Caminho da pasta copiado para a área de transferência.");
+            }).catch(err => {
+                console.error("Erro ao copiar caminho: ", err);
+            });
+        }
+    </script>
+</body>
+</html>

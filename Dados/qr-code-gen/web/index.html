@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Processador de Imagens</title>
+    <!-- O script do Eel eh injetado automaticamente pelo backend -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: #e0e0e0;
+            border-radius: 20px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            padding: 40px;
+            text-align: center;
+            width: 400px;
+        }
+        .btn {
+            background: #e0e0e0;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+            padding: 15px 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #555;
+            transition: all 0.2s ease-in-out;
+            display: inline-block;
+        }
+        .btn:active {
+            box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+        }
+        
+        /* Oculta o input padrao para usar o label com Neumorphism como botao */
+        input[type="file"] {
+            display: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 10px;
+            box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+            height: 20px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        /* Barra de progresso verde e animada */
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            transition: width 0.4s ease;
+        }
+
+        .status-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3 style="color: #444; margin-top: 0;">Ferramenta de Imagens</h3>
+        
+        <label class="btn">
+            Procurar Arquivos
+            <!-- 'multiple' permite ao Windows selecionar varias imagens soltas -->
+            <input type="file" id="fileInput" multiple accept="image/*">
+        </label>
+        
+        <div class="status-text" id="status">Aguardando selecao...</div>
+        
+        <button class="btn" id="processBtn" style="display:none;" onclick="iniciar()">Iniciar Processamento</button>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        let numArquivos = 0;
+
+        // Ouve a selecao de arquivos na interface do SO
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            numArquivos = e.target.files.length;
+            if (numArquivos > 0) {
+                document.getElementById('status').innerText = numArquivos + " arquivo(s) selecionado(s).";
+                document.getElementById('processBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('status').innerText = "Nenhum arquivo selecionado.";
+                document.getElementById('processBtn').style.display = 'none';
+            }
+        });
+
+        function iniciar() {
+            document.getElementById('processBtn').style.display = 'none';
+            document.getElementById('status').innerText = "Processando...";
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // Chama a funcao exposta no Python passando a quantidade de arquivos
+            eel.processar_imagens_backend(numArquivos)();
+        }
+
+        // Funcoes chamadas pelo backend em Python
+        eel.expose(atualizar_barra_progresso);
+        function atualizar_barra_progresso(valorFloat) {
+            document.getElementById('progressBar').style.width = valorFloat + '%';
+        }
+        
+        eel.expose(finalizar_processo);
+        function finalizar_processo() {
+            document.getElementById('status').innerText = "Operacao concluida!";
+            
+            // Reseta a interface apos 3 segundos
+            setTimeout(() => {
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('status').innerText = "Aguardando nova selecao.";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

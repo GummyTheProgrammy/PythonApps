@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Analisador de Diretórios</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>Analisador de Diretórios</h1>
+    <button id="btn-select" class="neu-button neu-button--primary">Selecionar Pasta</button>
+    <div class="breadcrumb" id="breadcrumb"></div>
+  </header>
+
+  <main class="layout" id="main-layout" style="display:none;">
+
+    <section class="panel panel--chart neu-panel">
+      <div class="panel-header">
+        <button id="btn-back" class="neu-button neu-button--small" disabled>&#8592; Voltar</button>
+        <span class="current-folder-name" id="current-folder-name">-</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="donut-chart"></canvas>
+        <div class="chart-center-label" id="chart-center-label"></div>
+      </div>
+    </section>
+
+    <section class="panel panel--list neu-panel">
+      <h2 class="panel-title">Itens do diretório</h2>
+      <div class="list-container" id="list-container">
+        <!-- itens inseridos dinamicamente -->
+      </div>
+    </section>
+
+  </main>
+
+  <div class="empty-state" id="empty-state">
+    <p>Nenhum diretório selecionado. Utilize o botão acima para escolher uma pasta raiz.</p>
+  </div>
+
+  <footer class="progress-dock" id="progress-dock" style="display:none;">
+    <div class="progress-label" id="progress-label">Processando: 0.0%</div>
+    <div class="progress-track neu-inset">
+      <div class="progress-fill" id="progress-fill" style="width:0%;"></div>
+    </div>
+  </footer>
+
+  <script type="text/javascript" src="js/app.js"></script>
+</body>
+</html>

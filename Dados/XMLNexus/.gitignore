@@ -1,0 +1,7 @@
+# Keep only the built executable distribution for this project.
+*
+!README.md
+!.gitignore
+!xmlnexus/
+!xmlnexus/dist/
+!xmlnexus/dist/*.exe

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+/* ============================================================================
+   VARIÁVEIS GLOBAIS — EDITE AQUI OS LINKS DA PÁGINA
+   Troque os valores "#" pelos links reais quando estiverem disponíveis.
+============================================================================ */
+window.VCL_CONFIG = {
+  links: {
+    apresentacaoInstitucional: "#",   // Link do PDF/PPTX da Apresentação Institucional
+    videoInstitucional: "https://www.youtube.com/watch?v=B0P4h5NOzqg",
+    ataRegistroPrecos: "#",           // Link do Google Drive - Ata de Registro de Preços
+    servicosDisponiveis: "#",         // Link do Google Drive - Serviços Disponíveis
+    documentosAdesao: "#",            // Link do Google Drive - Documentos para Adesão
+    whatsapp: "#",                    // Ex: https://wa.me/5521999999999
+    site: "https://www.vcl.com.br"
+  },
+  contato: {
+    nome: "André",
+    telefoneExibicao: "(21) 99999-9999",  // Como o número aparece na tela
+    telefoneDiscagem: "+5521999999999",   // Número usado para discar/copiar (só dígitos + DDI)
+    email: "comercial@vcl.com.br"
+  }
+};
+</script>
+
+<title>VCL</title>
+
+<style>
+  /* ==========================================================================
+     VARIÁVEIS GLOBAIS — TAMANHO DE TÍTULO E SUBTÍTULO DOS BOTÕES
+     Ajuste estes dois valores para controlar o texto de todos os botões
+     de link da página de uma só vez.
+  ========================================================================== */
+  :root{
+    --btn-title-size: 0.95rem;
+    --btn-subtitle-size: 0.78rem;
+
+    /* Paleta */
+    --paper:      #F2F0E3;
+    --ink:        #1E2A22;
+    --forest:     #1F3D2C;
+    --forest-2:   #2C5240;
+    --sage:       #8CA593;
+    --sage-tint:  #E4E9DF;
+    --bark:       #7A5B3E;
+    --gold:       #B8862F;
+    --card-bg:    #FBF9F0;
+
+    --radius-card: 16px;
+    --radius-pill: 999px;
+    --shadow: 0 6px 20px rgba(31, 61, 44, 0.10);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3{
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    margin: 0;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+
+  /* ---------------------------- Botão de alternância de visualização ---------------------------- */
+  #viewToggle{
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 999;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.28);
+    background: rgba(30, 42, 34, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    color:#fff;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  #viewToggle:hover{ background: rgba(30, 42, 34, 0.78); transform: scale(1.06); }
+  #viewToggle svg{ width:18px; height:18px; display:block; }
+
+  /* ---------------------------- Header ---------------------------- */
+  header.hero{
+    background: linear-gradient(160deg, var(--forest), var(--forest-2));
+    color: #F2F0E3;
+    padding: 88px 24px 56px;
+    text-align:center;
+    position: relative;
+    overflow: hidden;
+  }
+  header.hero .brand{
+    font-size: clamp(2.4rem, 6vw, 3.4rem);
+    letter-spacing: 0.02em;
+    font-weight: 600;
+  }
+  header.hero .kicker{
+    margin-top: 10px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--sage);
+    font-weight: 600;
+  }
+  header.hero p.lead{
+    max-width: 640px;
+    margin: 22px auto 0;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(242,240,227,0.88);
+  }
+  header.hero .wave{
+    position:absolute; left:0; right:0; bottom:-1px; line-height:0;
+  }
+
+  /* ---------------------------- Conteúdo ---------------------------- */
+  main{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 20px 24px;
+  }
+
+  .cards{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  @media (min-width: 720px){
+    .cards{ grid-template-columns: repeat(2, 1fr); }
+    .cards .card.wide{ grid-column: 1 / -1; }
+  }
+
+  /* Força a visualização escolhida no botão, independente da largura real da tela */
+  html[data-view="mobile"] .cards{ grid-template-columns: 1fr !important; }
+  html[data-view="desktop"] .cards{ grid-template-columns: repeat(2, 1fr) !important; }
+  html[data-view="desktop"] .cards .card.wide{ grid-column: 1 / -1; }
+
+  .card{
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow);
+    padding: 26px 24px;
+    border-left: 4px solid var(--sage);
+    display:flex;
+    flex-direction: column;
+    gap: 10px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: rise 0.6s ease forwards;
+  }
+  .card:nth-child(2){ animation-delay: .05s; border-left-color: var(--forest-2); }
+  .card:nth-child(3){ animation-delay: .10s; border-left-color: var(--gold); }
+  .card:nth-child(4){ animation-delay: .15s; border-left-color: var(--bark); }
+  .card:nth-child(5){ animation-delay: .20s; }
+
+  @keyframes rise{
+    to{ opacity:1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{ animation: none; opacity:1; transform:none; }
+  }
+
+  .card .leaf{
+    width: 20px; height:20px; color: var(--forest-2); opacity:.7;
+  }
+  .card h3{
+    font-size: 1.2rem;
+    color: var(--forest);
+  }
+  .card p{
+    margin:0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: #3B4A40;
+  }
+  .card ul{
+    margin: 2px 0 4px;
+    padding-left: 18px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #3B4A40;
+  }
+
+  /* ---------------------------- Botões-link (leves) ---------------------------- */
+  .cta-btn{
+    align-self: flex-start;
+    display:inline-flex;
+    align-items:center;
+    text-align:left;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    background: var(--sage-tint);
+    color: var(--forest);
+    font-size: var(--btn-title-size);
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    border: 1px solid rgba(31,61,44,0.12);
+    cursor:pointer;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  }
+  .cta-btn:hover{
+    background: var(--gold);
+    color: #FFFDF6;
+    transform: translateY(-1px);
+  }
+  .cta-btn .sub{
+    display:block;
+    font-size: var(--btn-subtitle-size);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+
+  /* ---------------------------- Contato Comercial ---------------------------- */
+  section.contato{
+    background: var(--forest);
+    color: #F2F0E3;
+    border-radius: var(--radius-card);
+    padding: 32px 24px;
+    margin: 36px 0 12px;
+  }
+  section.contato h2{
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  section.contato .team-kicker{
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--sage);
+    font-weight: 600;
+    margin-bottom: 18px;
+  }
+  .person{
+    background: rgba(242,240,227,0.06);
+    border: 1px solid rgba(242,240,227,0.14);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .person .name{
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 1.02rem;
+  }
+  .contact-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .contact-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding: 9px 14px;
+    border-radius: var(--radius-pill);
+    background: rgba(242,240,227,0.08);
+    border: 1px solid rgba(242,240,227,0.2);
+    font-size: 0.88rem;
+    color: #F2F0E3;
+    cursor:pointer;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .contact-chip:hover{
+    background: var(--gold);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  .site-btn-wrap{
+    text-align:center;
+    margin-top: 22px;
+  }
+  .site-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding: 13px 26px;
+    border-radius: var(--radius-pill);
+    background: var(--gold);
+    color: #2A1E0C;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .site-btn:hover{ background: #cf9a3b; }
+
+  footer.note{
+    text-align:center;
+    font-size: 0.75rem;
+    color: #8B9A90;
+    padding: 20px 0 40px;
+  }
+
+  /* ---------------------------- Toast (copiar telefone) ---------------------------- */
+  #toast{
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translate(-50%, 12px);
+    background: var(--ink);
+    color: #F2F0E3;
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    opacity: 0;
+    pointer-events:none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+  #toast.show{
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  :focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+</style>
+</head>
+
+<body>
+
+<button id="viewToggle" aria-label="Alternar visualização entre PC e celular" title="Alternar visualização"></button>
+
+<header class="hero">
+  <div class="brand">VCL</div>
+  <div class="kicker">Conheça Nossa Empresa</div>
+  <p class="lead">
+    Bem-vindo à VCL. Conheça nossa história, nossa estrutura, nossa capacidade
+    operacional e as soluções que desenvolvemos para arborização urbana,
+    paisagismo, produção de mudas, reflorestamento e manutenção de áreas verdes.
+  </p>
+  <div class="wave">
+    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:40px;">
+      <path d="M0,32 C240,60 480,0 720,20 C960,40 1200,60 1440,28 L1440,60 L0,60 Z" fill="#F2F0E3"></path>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <div class="cards" id="cardsGrid">
+
+    <div class="card">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c-4-2-8-6-8-12A8 8 0 0 1 12 2a8 8 0 0 1 8 8c0 6-4 10-8 12Z"/><path d="M12 22V10"/></svg>
+      <h3>Apresentação Institucional</h3>
+      <p>Conheça a história da VCL, nossa estrutura, equipe técnica, viveiros, frota, capacidade operacional e os principais projetos desenvolvidos ao longo de mais de 30 anos.</p>
+      <a class="cta-btn" href="javascript:void(0)" data-link="apresentacaoInstitucional" target="_blank" rel="noopener">
+        🔗 Abrir Apresentação Institucional (PDF)
+      </a>
+    </div>
+
+    <div class="card">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c-4-2-8-6-8-12A8 8 0 0 1 12 2a8 8 0 0 1 8 8c0 6-4 10-8 12Z"/><path d="M12 22V10"/></svg>
+      <h3>Vídeo Institucional</h3>
+      <p>Assista ao vídeo institucional e conheça nossa operação, infraestrutura e capacidade de execução.</p>
+      <a class="cta-btn" href="javascript:void(0)" data-link="videoInstitucional" target="_blank" rel="noopener">
+        🎬 Assistir ao Vídeo Institucional
+      </a>
+    </div>
+
+    <div class="card">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c-4-2-8-6-8-12A8 8 0 0 1 12 2a8 8 0 0 1 8 8c0 6-4 10-8 12Z"/><path d="M12 22V10"/></svg>
+      <h3>Ata de Registro de Preços</h3>
+      <p>Tenha acesso à Ata de Registro de Preços vigente.</p>
+      <a class="cta-btn" href="javascript:void(0)" data-link="ataRegistroPrecos" target="_blank" rel="noopener">
+        📄 Abrir Ata de Registro de Preços
+      </a>
+    </div>
+
+    <div class="card">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c-4-2-8-6-8-12A8 8 0 0 1 12 2a8 8 0 0 1 8 8c0 6-4 10-8 12Z"/><path d="M12 22V10"/></svg>
+      <h3>Serviços Disponíveis</h3>
+      <p>Consulte todos os serviços contemplados na Ata de Registro de Preços.</p>
+      <a class="cta-btn" href="javascript:void(0)" data-link="servicosDisponiveis" target="_blank" rel="noopener">
+        📋 Ver Serviços Disponíveis
+      </a>
+    </div>
+
+    <div class="card wide">
+      <svg class="leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22c-4-2-8-6-8-12A8 8 0 0 1 12 2a8 8 0 0 1 8 8c0 6-4 10-8 12Z"/><path d="M12 22V10"/></svg>
+      <h3>Documentos para Adesão</h3>
+      <p>Acesse toda a documentação necessária para realizar a adesão à Ata de Registro de Preços.</p>
+      <ul>
+        <li>Solicitação de Adesão</li>
+        <li>Termo de Referência</li>
+        <li>Edital</li>
+        <li>Planilhas</li>
+        <li>Anexos</li>
+        <li>Demais documentos pertinentes</li>
+      </ul>
+      <a class="cta-btn" href="javascript:void(0)" data-link="documentosAdesao" target="_blank" rel="noopener">
+        📁 Acessar Documentação
+      </a>
+    </div>
+
+  </div>
+
+  <section class="contato">
+    <div class="team-kicker">Contato Comercial</div>
+    <h2>Equipe Comercial VCL</h2>
+    <div class="person" style="margin-top:16px;">
+      <div class="name" id="contatoNome">👤 André</div>
+      <div class="contact-row">
+        <a class="contact-chip" id="whatsappBtn" href="javascript:void(0)" target="_blank" rel="noopener">📱 WhatsApp</a>
+        <button class="contact-chip" id="telefoneBtn" type="button">☎️ Telefone</button>
+        <a class="contact-chip" id="emailBtn" href="javascript:void(0)">📧 E-mail</a>
+      </div>
+    </div>
+
+    <div class="site-btn-wrap">
+      <a class="site-btn" id="siteBtn" href="javascript:void(0)" target="_blank" rel="noopener">🌐 www.vcl.com.br</a>
+    </div>
+  </section>
+
+  <footer class="note">Sujeito a revisão</footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var CFG = window.VCL_CONFIG;
+
+  /* --------- Preenche links a partir das variáveis globais --------- */
+  document.querySelectorAll('[data-link]').forEach(function(el){
+    var key = el.getAttribute('data-link');
+    el.setAttribute('href', CFG.links[key] || '#');
+  });
+
+  document.getElementById('whatsappBtn').setAttribute('href', CFG.links.whatsapp || '#');
+  document.getElementById('siteBtn').setAttribute('href', CFG.links.site || '#');
+  document.getElementById('emailBtn').setAttribute('href', 'mailto:' + CFG.contato.email);
+  document.getElementById('contatoNome').textContent = '👤 ' + CFG.contato.nome;
+
+  /* --------- Detecção simples de dispositivo móvel --------- */
+  function isMobileDevice(){
+    var ua = navigator.userAgent || navigator.vendor || '';
+    var uaMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    var coarsePointer = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    return uaMobile || coarsePointer;
+  }
+
+  /* --------- Toast --------- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2200);
+  }
+
+  function copyText(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(function(){ legacyCopy(text); });
+    } else {
+      legacyCopy(text);
+    }
+  }
+  function legacyCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  /* --------- Botão de telefone: liga no celular, copia no PC --------- */
+  document.getElementById('telefoneBtn').addEventListener('click', function(){
+    var numero = CFG.contato.telefoneDiscagem;
+    if (isMobileDevice()){
+      window.location.href = 'tel:' + numero;
+    } else {
+      copyText(CFG.contato.telefoneExibicao);
+      showToast('Copiado para a área de transferência');
+    }
+  });
+
+  /* --------- Alternância de visualização PC / Celular --------- */
+  var htmlEl = document.documentElement;
+  var toggleBtn = document.getElementById('viewToggle');
+
+  var iconDesktop = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>';
+  var iconMobile = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>';
+
+  function computeNativeView(){
+    return window.innerWidth <= 720 ? 'mobile' : 'desktop';
+  }
+
+  var currentView = computeNativeView();
+
+  function applyView(view){
+    currentView = view;
+    htmlEl.setAttribute('data-view', view);
+    toggleBtn.innerHTML = view === 'desktop' ? iconDesktop : iconMobile;
+    toggleBtn.setAttribute('aria-pressed', view === 'desktop' ? 'true' : 'false');
+  }
+
+  applyView(currentView);
+
+  toggleBtn.addEventListener('click', function(){
+    applyView(currentView === 'desktop' ? 'mobile' : 'desktop');
+  });
+})();
+</script>
+
+</body>
+</html>

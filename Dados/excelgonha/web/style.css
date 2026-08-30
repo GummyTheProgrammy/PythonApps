@@ -1,0 +1,144 @@
+:root {
+    --bg-color: #E0E5EC;
+    --text-color: #31363F;
+    --accent-color: #97A4F1;
+    --light-shadow: #ffffff;
+    --dark-shadow: #a3b1c6;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    text-align: center;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Sombras Neumorphism */
+.neumorph-box {
+    background: var(--bg-color);
+    box-shadow: 9px 9px 16px var(--dark-shadow), -9px -9px 16px var(--light-shadow);
+    border-radius: 20px;
+}
+
+.neumorph-box-inset {
+    background: var(--bg-color);
+    box-shadow: inset 6px 6px 10px 0 var(--dark-shadow), inset -6px -6px 10px 0 var(--light-shadow);
+    border-radius: 15px;
+}
+
+/* Área de Upload */
+#drop-zone {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#drop-zone:active {
+    box-shadow: inset 6px 6px 10px 0 var(--dark-shadow), inset -6px -6px 10px 0 var(--light-shadow);
+}
+
+/* Barra de Progresso e Loading */
+.loader {
+    border: 5px solid var(--bg-color);
+    border-top: 5px solid var(--accent-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px auto;
+    box-shadow: 6px 6px 10px var(--dark-shadow), -6px -6px 10px var(--light-shadow);
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.progress-container {
+    height: 15px;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-color);
+    transition: width 0.2s ease;
+}
+
+/* Botões e Listas */
+.neumorph-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    outline: none;
+    border-radius: 12px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 6px 6px 10px var(--dark-shadow), -6px -6px 10px var(--light-shadow);
+    transition: all 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.neumorph-btn:active {
+    box-shadow: inset 4px 4px 8px var(--dark-shadow), inset -4px -4px 8px var(--light-shadow);
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.list-container {
+    height: 200px;
+    overflow-y: auto;
+    padding: 15px;
+    text-align: left;
+}
+
+.file-item {
+    padding: 10px;
+    border-bottom: 1px solid rgba(163,177,198,0.3);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-item button {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    font-weight: bold;
+}

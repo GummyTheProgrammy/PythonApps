@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisor de Arquivos</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <style>
+        body {
+            background-color: #e0e5ec;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            width: 400px;
+            padding: 40px;
+            border-radius: 20px;
+            background-color: #e0e5ec;
+            box-shadow: 9px 9px 16px rgb(163,177,198,0.6), 
+                       -9px -9px 16px rgba(255,255,255, 0.5);
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+
+        input[type="file"], input[type="number"] {
+            width: 90%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e0e5ec;
+            box-shadow: inset 6px 6px 10px 0 rgba(163,177,198, 0.7),
+                        inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
+            color: #333;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #e0e5ec;
+            box-shadow: 6px 6px 10px 0 rgba(163,177,198, 0.7),
+                       -6px -6px 10px 0 rgba(255,255,255, 0.8);
+            color: #4a5568;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        button:active {
+            box-shadow: inset 6px 6px 10px 0 rgba(163,177,198, 0.7),
+                        inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
+        }
+
+        .progress-container {
+            margin-top: 30px;
+            width: 100%;
+            height: 20px;
+            border-radius: 10px;
+            background-color: #e0e5ec;
+            box-shadow: inset 6px 6px 10px 0 rgba(163,177,198, 0.7),
+                        inset -6px -6px 10px 0 rgba(255,255,255, 0.8);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Divisor de TXT</h2>
+        
+        <input type="file" id="arquivo" accept=".txt">
+        <input type="number" id="partes" placeholder="Quantidade de partes" min="1">
+        
+        <button onclick="iniciarDivisao()">Dividir Arquivo</button>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="barraProgresso"></div>
+        </div>
+
+        <p id="status">Aguardando inserção de dados.</p>
+    </div>
+
+    <script>
+        // Função exposta para o Python chamar e atualizar a barra
+        eel.expose(atualizar_progresso);
+        function atualizar_progresso(valor_float) {
+            document.getElementById('barraProgresso').style.width = valor_float + '%';
+        }
+
+        function iniciarDivisao() {
+            const inputArquivo = document.getElementById('arquivo');
+            const inputPartes = document.getElementById('partes').value;
+            const statusTexto = document.getElementById('status');
+
+            if (inputArquivo.files.length === 0) {
+                statusTexto.innerText = "Nenhum arquivo foi selecionado.";
+                return;
+            }
+
+            if (!inputPartes || inputPartes <= 0) {
+                statusTexto.innerText = "Quantidade de partes inválida.";
+                return;
+            }
+
+            const arquivo = inputArquivo.files[0];
+            const leitor = new FileReader();
+
+            statusTexto.innerText = "Processamento iniciado...";
+            document.getElementById('barraProgresso').style.width = '0%';
+
+            leitor.onload = function(evento) {
+                const conteudo = evento.target.result;
+                const nome = arquivo.name;
+
+                // Chama a função Python passando o conteúdo lido
+                eel.processar_divisao(nome, conteudo, inputPartes)(function(resposta) {
+                    statusTexto.innerText = resposta;
+                });
+            };
+
+            leitor.readAsText(arquivo);
+        }
+    </script>
+</body>
+</html>

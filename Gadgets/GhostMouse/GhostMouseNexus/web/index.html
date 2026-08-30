@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GhostMouse Nexus</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <main id="main-container" class="screen active">
+        <header class="header">
+            <h1>GhostMouse Nexus</h1>
+            <h2>F3: Gravar/Parar | F4: Reproduzir/Parar</h2>
+        </header>
+
+        <div class="content-center">
+            <button id="master-btn" class="neumorphic-btn giant-btn">
+                <div id="status-icon" class="icon-idle"></div>
+                <span id="btn-text">Preparar</span>
+            </button>
+            <p id="main-status">Aguardando comando...</p>
+        </div>
+
+        <footer class="footer">
+            <p>Designed by</p>
+            <p>Daniel Henry</p>
+        </footer>
+    </main>
+
+    <div id="overlay-blur" class="hidden"></div>
+    <script src="script.js"></script>
+</body>
+</html>
